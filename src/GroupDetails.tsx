@@ -28,54 +28,85 @@ export default function GroupDetails({ isOpen, onClose, participants, avatars }:
                         animate={{ y: 0 }}
                         exit={{ y: "-100%" }}
                         transition={{ type: "spring", damping: 25, stiffness: 200 }}
-                        className="fixed inset-x-0 top-0 z-50 bg-[#F2F2F7] dark:bg-[#1C1C1E] rounded-b-3xl shadow-xl overflow-hidden max-h-[80vh] flex flex-col"
+                        className="fixed inset-x-0 top-0 z-50 bg-[#F2F2F7] dark:bg-[#1C1C1E] rounded-b-3xl shadow-xl flex flex-col max-h-[90vh]"
                     >
-
-                        <div className="p-4 pt-12 flex flex-col items-center">
-                            <div className="w-16 h-1 bg-gray-300 dark:bg-gray-600 rounded-full mb-6" />
-
-                            <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
-                                {participants.length} People
-                                <svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg" className="rotate-180">
-                                    <path d="M2 3L5 6L8 3" stroke="#8E8E93" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                </svg>
-                            </h2>
-
-                            {/* Actions Grid */}
-                            <div className="flex gap-4 mb-8 w-full justify-center px-4">
-                                <ActionButton icon="message" label="message" active />
-                                <ActionButton icon="call" label="audio" />
-                                <ActionButton icon="video" label="video" />
-                                <ActionButton icon="mail" label="mail" />
-                            </div>
+                        {/* Header Drag/Tap Handle Area */}
+                        <div
+                            className="absolute top-0 inset-x-0 h-14 flex items-center justify-center cursor-pointer"
+                            onClick={onClose}
+                        >
+                            <div className="w-10 h-1.5 bg-gray-300 dark:bg-gray-600 rounded-full mt-3" />
                         </div>
 
-                        {/* Participants List */}
-                        <div className="bg-white dark:bg-[#2C2C2E] mx-4 mb-8 rounded-xl overflow-hidden">
-                            {participants.map((person, i) => (
-                                <div key={person} className="relative">
-                                    <div className="flex items-center gap-3 p-3 z-10 relative bg-white dark:bg-[#2C2C2E]">
-                                        <img src={avatars[person]} alt={person} className="w-10 h-10 rounded-full bg-gray-200 object-cover" />
-                                        <div className="flex-1">
-                                            <div className="font-medium text-[17px]">{person}</div>
-                                            <div className="text-[13px] text-[#8E8E93]">mobile</div>
-                                        </div>
-                                        <div className="flex gap-3">
-                                            <ActionIcon type="message" />
-                                            <ActionIcon type="video" />
-                                        </div>
-                                    </div>
-                                    {i !== participants.length - 1 && (
-                                        <div className="absolute bottom-0 right-0 left-16 h-[1px] bg-gray-100 dark:bg-[#3A3A3C]" />
-                                    )}
-                                </div>
-                            ))}
-                        </div>
-
-                        <div className="px-4 pb-6">
-                            <button onClick={onClose} className="w-full bg-white dark:bg-[#2C2C2E] text-[#FF3B30] font-medium py-3 rounded-xl text-[17px]">
-                                Leave this Conversation
+                        {/* Done Button */}
+                        <div className="absolute top-4 right-4 z-10">
+                            <button
+                                onClick={onClose}
+                                className="text-[#007AFF] font-semibold text-[17px] py-2 px-1"
+                            >
+                                Done
                             </button>
+                        </div>
+
+                        <div className="flex-1 overflow-y-auto pt-10 pb-6 hide-scrollbar">
+                            <div className="p-4 flex flex-col items-center">
+                                <div className="mt-8 flex items-center justify-center -space-x-4 mb-4">
+                                    {participants.slice(0, 3).map((char, i) => (
+                                        <div key={char} className={cn("relative z-10", i === 1 && "z-20 -mt-2")}>
+                                            <img
+                                                src={avatars[char]}
+                                                alt={char}
+                                                className="w-16 h-16 rounded-full border-2 border-white dark:border-black bg-gray-200 object-cover shadow-sm"
+                                            />
+                                        </div>
+                                    ))}
+                                </div>
+
+                                <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
+                                    {participants.length} People
+                                    <svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg" className="rotate-180">
+                                        <path d="M2 3L5 6L8 3" stroke="#8E8E93" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                    </svg>
+                                </h2>
+
+                                {/* Actions Grid */}
+                                <div className="flex gap-4 mb-8 w-full justify-center px-4">
+                                    <ActionButton icon="message" label="message" active />
+                                    <ActionButton icon="call" label="audio" />
+                                    <ActionButton icon="video" label="video" />
+                                    <ActionButton icon="mail" label="mail" />
+                                </div>
+
+                                {/* Participants List */}
+                                <div className="w-full">
+                                    <div className="bg-white dark:bg-[#2C2C2E] rounded-xl overflow-hidden mb-8">
+                                        {participants.map((person, i) => (
+                                            <div key={person} className="relative">
+                                                <div className="flex items-center gap-3 p-3 z-10 relative bg-white dark:bg-[#2C2C2E]">
+                                                    <img src={avatars[person]} alt={person} className="w-10 h-10 rounded-full bg-gray-200 object-cover" />
+                                                    <div className="flex-1">
+                                                        <div className="font-medium text-[17px]">{person}</div>
+                                                        <div className="text-[13px] text-[#8E8E93]">mobile</div>
+                                                    </div>
+                                                    <div className="flex gap-3">
+                                                        <ActionIcon type="message" />
+                                                        <ActionIcon type="video" />
+                                                    </div>
+                                                </div>
+                                                {i !== participants.length - 1 && (
+                                                    <div className="absolute bottom-0 right-0 left-16 h-[1px] bg-gray-100 dark:bg-[#3A3A3C]" />
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                    <div className="px-0">
+                                        <button onClick={onClose} className="w-full bg-white dark:bg-[#2C2C2E] text-[#FF3B30] font-medium py-3 rounded-xl text-[17px]">
+                                            Leave this Conversation
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </motion.div>
                 </>

@@ -142,7 +142,7 @@ export default function App() {
           <span className="font-normal text-[17px]">Filters</span>
         </button>
 
-        <div className="flex flex-col items-center cursor-pointer" onClick={() => setShowGroupDetails(true)}>
+        <div className="flex flex-col items-center cursor-pointer" onClick={() => setShowGroupDetails(!showGroupDetails)}>
           <div className="flex items-center justify-center -space-x-4 mb-2">
             {CHARACTERS.slice(0, 3).map((char, i) => (
               <div key={char} className={cn("relative z-10", i === 1 && "z-20 -mt-4")}>
@@ -154,7 +154,11 @@ export default function App() {
               </div>
             ))}
           </div>
-          <div className="flex flex-col items-center">
+          <div className="flex flex-col items-center" onClick={(e) => {
+            if (e.detail === 3) { // Triple tap for diagnostic
+              alert(`Convex URL: ${import.meta.env.VITE_CONVEX_URL}`);
+            }
+          }}>
             <h1 className="text-[13px] font-semibold flex items-center gap-1">
               Mediocre Mastermind
               <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
