@@ -293,10 +293,20 @@ export default function App() {
               placeholder="iMessage"
               value={input}
               onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSend();
+                }
+              }}
             />
             {input.trim() && (
               <button
                 type="submit"
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleSend();
+                }}
                 disabled={isSending}
                 className="absolute right-1 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-full bg-[#007AFF] text-white transition-all active:scale-90 hover:bg-[#0066D6] disabled:opacity-50 disabled:scale-100 z-10"
               >
