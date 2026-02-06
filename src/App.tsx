@@ -10,7 +10,7 @@ import "./index.css";
 const CHARACTERS = [
   "OJ Simpson",
   "Jeffrey Epstein",
-  "Jeffery Dahmer",
+  "Jeffrey Dahmer",
   "El Chapo",
   "Joseph Stalin",
 ];
@@ -19,9 +19,9 @@ const AVATARS: Record<string, string> = {
   "Me": "https://api.dicebear.com/9.x/micah/svg?seed=Me&backgroundColor=b6e3f4",
   "OJ Simpson": "/avatars/oj.jpg",
   "Jeffrey Epstein": "/avatars/epstein.jpg",
-  "Jeffery Dahmer": "/avatars/dahmer.jpg",
+  "Jeffrey Dahmer": "/avatars/dahmer.png",
   "El Chapo": "/avatars/chapo.jpg",
-  "Joseph Stalin": "/avatars/stalin.jpg",
+  "Joseph Stalin": "/avatars/stalin.png",
 };
 
 export default function App() {
