@@ -8,4 +8,9 @@ export default defineSchema({
         sessionId: v.string(), // To keep chats separate for the user
         timestamp: v.optional(v.number()),
     }).index("by_sessionId", ["sessionId"]),
+    typingIndicators: defineTable({
+        author: v.string(),
+        sessionId: v.string(),
+    }).index("by_sessionId_author", ["sessionId", "author"])
+        .index("by_sessionId", ["sessionId"]),
 });
