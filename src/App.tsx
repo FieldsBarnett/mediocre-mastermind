@@ -88,13 +88,19 @@ export default function App() {
     }
   }, [messages]);
 
+  const isSendingRef = useRef(false);
   const [isSending, setIsSending] = useState(false);
 
   const handleSend = async (e?: React.SyntheticEvent) => {
-    if (e) e.preventDefault();
-    const messageBody = input.trim();
-    if (!messageBody || isSending) return;
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
 
+    const messageBody = input.trim();
+    if (!messageBody || isSendingRef.current) return;
+
+    isSendingRef.current = true;
     setIsSending(true);
     playSentSound();
     setInput("");
@@ -109,6 +115,7 @@ export default function App() {
       console.error("Failed to send message:", error);
       setInput(messageBody);
     } finally {
+      isSendingRef.current = false;
       setIsSending(false);
     }
   };
@@ -286,16 +293,10 @@ export default function App() {
               placeholder="iMessage"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && !e.shiftKey) {
-                  handleSend(e);
-                }
-              }}
             />
             {input.trim() && (
               <button
                 type="submit"
-                onClick={(e) => handleSend(e)}
                 disabled={isSending}
                 className="absolute right-1 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-full bg-[#007AFF] text-white transition-all active:scale-90 hover:bg-[#0066D6] disabled:opacity-50 disabled:scale-100 z-10"
               >
