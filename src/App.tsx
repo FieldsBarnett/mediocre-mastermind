@@ -88,18 +88,29 @@ export default function App() {
     }
   }, [messages]);
 
-  const handleSend = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!input.trim()) return;
+  const [isSending, setIsSending] = useState(false);
 
-    playSentSound(); // Play immediately for better UX
+  const handleSend = async (e?: React.SyntheticEvent) => {
+    if (e) e.preventDefault();
+    const messageBody = input.trim();
+    if (!messageBody || isSending) return;
 
-    await sendMessage({
-      body: input,
-      author: "Me",
-      sessionId,
-    });
+    setIsSending(true);
+    playSentSound();
     setInput("");
+
+    try {
+      await sendMessage({
+        body: messageBody,
+        author: "Me",
+        sessionId,
+      });
+    } catch (error) {
+      console.error("Failed to send message:", error);
+      setInput(messageBody);
+    } finally {
+      setIsSending(false);
+    }
   };
 
   const handleClear = async () => {
@@ -107,7 +118,7 @@ export default function App() {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-white dark:bg-black text-black dark:text-white relative overflow-hidden">
+    <div className="flex flex-col h-[100dvh] bg-white dark:bg-black text-black dark:text-white relative overflow-hidden">
       <GroupDetails
         isOpen={showGroupDetails}
         onClose={() => setShowGroupDetails(false)}
@@ -271,17 +282,24 @@ export default function App() {
             <input
               autoFocus
               type="text"
-              className="w-full rounded-full border border-[#C6C6C6] dark:border-[#3A3A3C] bg-white dark:bg-[#1C1C1E] pl-4 pr-12 py-1.5 text-[17px] text-black dark:text-white placeholder-[#8E8E93] focus:outline-none focus:border-[#8E8E93]"
+              className="w-full rounded-full border border-[#C6C6C6] dark:border-[#3A3A3C] bg-white dark:bg-[#1C1C1E] pl-4 pr-10 py-1.5 text-[17px] text-black dark:text-white placeholder-[#8E8E93] focus:outline-none focus:border-[#8B8B8D] transition-colors"
               placeholder="iMessage"
               value={input}
               onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  handleSend(e);
+                }
+              }}
             />
             {input.trim() && (
               <button
                 type="submit"
-                className="absolute right-1.5 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-full bg-[#007AFF] text-white transition-all active:scale-95 z-10"
+                onClick={(e) => handleSend(e)}
+                disabled={isSending}
+                className="absolute right-1 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-full bg-[#007AFF] text-white transition-all active:scale-90 hover:bg-[#0066D6] disabled:opacity-50 disabled:scale-100 z-10"
               >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="pointer-events-none">
                   <path d="M12 19V5M5 12l7-7 7 7" />
                 </svg>
               </button>

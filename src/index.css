@@ -36,6 +36,7 @@
 
   .ios-input-container {
     @apply sticky bottom-0 z-50 w-full px-4 py-2 bg-white/90 dark:bg-black/90 backdrop-blur-xl border-t border-gray-200 dark:border-gray-800;
+    padding-bottom: calc(env(safe-area-inset-bottom) + 0.5rem);
   }
 
   .ios-input {
