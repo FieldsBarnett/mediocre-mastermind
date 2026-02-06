@@ -39,6 +39,7 @@ export default function App() {
 
   const [input, setInput] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [readReceipt, setReadReceipt] = useState<string | null>(null);
 
   // Sound effects logic
   const prevMessagesLength = useRef(0);
@@ -46,15 +47,38 @@ export default function App() {
   useEffect(() => {
     if (messages) {
       if (messages.length > prevMessagesLength.current) {
-        // Find the new message(s)
-        const newMessagesInfo = messages.slice(prevMessagesLength.current);
-        const lastNewMessage = newMessagesInfo[newMessagesInfo.length - 1];
+        const lastMsg = messages[messages.length - 1];
 
-        // If the last new message is NOT from me, play received sound
-        if (lastNewMessage && lastNewMessage.author !== "Me") {
+        // Handle incoming AI messages
+        if (lastMsg.author !== "Me") {
           playReceivedSound();
+          setReadReceipt(null); // Clear receipt when conversation moves on
         }
-        // Note: Sent sound is played in handleSend for immediate feedback
+
+        // Generate randomized read receipt for my messages
+        if (lastMsg.author === "Me") {
+          setReadReceipt(null);
+          const delay = Math.random() * 2000 + 1000; // 1-3 seconds
+          setTimeout(() => {
+            const others = CHARACTERS.sort(() => 0.5 - Math.random());
+            const numRead = Math.floor(Math.random() * 3) + 1;
+            const selected = others.slice(0, numRead);
+
+            let receipt = "";
+            if (numRead === 1) {
+              receipt = `Read by ${selected[0]}`;
+            } else if (numRead === 2) {
+              receipt = `Read by ${selected[0]} and ${selected[1]}`;
+            } else {
+              receipt = `Read by ${selected[0]} and ${others.length - 1} others`;
+            }
+
+            // Randomly use "Seen" instead of "Read"
+            if (Math.random() > 0.7) receipt = receipt.replace("Read", "Seen");
+
+            setReadReceipt(receipt);
+          }, delay);
+        }
       }
       prevMessagesLength.current = messages.length;
 
@@ -133,106 +157,110 @@ export default function App() {
       </header>
 
       {/* Chat Area */}
-      <main className="flex-1 overflow-y-auto p-4 space-y-1 hide-scrollbar" ref={scrollRef}>
-        <div className="text-center text-[#8E8E93] text-xs font-medium my-4">
-          iMessage
-        </div>
+      <main className="flex-1 overflow-y-auto hide-scrollbar" ref={scrollRef}>
+        <div className="max-w-3xl mx-auto w-full p-4 space-y-1">
+          <div className="text-center text-[#8E8E93] text-xs font-medium my-4">
+            iMessage
+          </div>
 
-        <AnimatePresence initial={false}>
-          {messages?.map((msg, idx) => {
-            const isMe = msg.author === "Me";
-            const prevMsg = messages[idx - 1];
-            const nextMsg = messages[idx + 1];
+          <AnimatePresence initial={false}>
+            {messages?.map((msg, idx) => {
+              const isMe = msg.author === "Me";
+              const prevMsg = messages[idx - 1];
+              const nextMsg = messages[idx + 1];
 
-            const isFirstInGroup = !prevMsg || prevMsg.author !== msg.author;
-            const isLastInGroup = !nextMsg || nextMsg.author !== msg.author;
+              const isFirstInGroup = !prevMsg || prevMsg.author !== msg.author;
+              const isLastInGroup = !nextMsg || nextMsg.author !== msg.author;
 
-            return (
-              <motion.div
-                key={msg._id}
-                initial={{ opacity: 0, scale: 0.9, y: 10 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                className={cn(
-                  "flex w-full flex-col",
-                  isMe ? "items-end" : "items-start",
-                  isFirstInGroup && "mt-3"
-                )}
-              >
-                {!isMe && isFirstInGroup && (
-                  <span className="ml-12 text-[11px] text-[#8E8E93] mb-1 pl-1">
-                    {msg.author}
-                  </span>
-                )}
-
-                <div className="flex items-end gap-2 max-w-[85%]">
-                  {!isMe && (
-                    <div className="w-8 flex-shrink-0">
-                      {isLastInGroup ? (
-                        <img
-                          src={AVATARS[msg.author]}
-                          alt={msg.author}
-                          className="w-8 h-8 rounded-full bg-gray-200 object-cover"
-                        />
-                      ) : <div className="w-8" />}
-                    </div>
+              return (
+                <motion.div
+                  key={msg._id}
+                  initial={{ opacity: 0, scale: 0.9, y: 10 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                  className={cn(
+                    "flex w-full flex-col",
+                    isMe ? "items-end" : "items-start",
+                    isFirstInGroup && "mt-3"
+                  )}
+                >
+                  {!isMe && isFirstInGroup && (
+                    <span className="ml-12 text-[11px] text-[#8E8E93] mb-1 pl-1">
+                      {msg.author}
+                    </span>
                   )}
 
-                  <div
-                    className={cn(
-                      "px-4 py-2 text-[17px] leading-snug break-words shadow-sm",
-                      isMe
-                        ? "bg-[#007AFF] text-white rounded-2xl rounded-br-md"
-                        : "bg-[#E9E9EB] dark:bg-[#262628] text-black dark:text-white rounded-2xl rounded-bl-md",
-                      !isLastInGroup && isMe && "rounded-br-2xl",
-                      !isLastInGroup && !isMe && "rounded-bl-2xl",
-                      isLastInGroup && isMe && "rounded-br-sm",
-                      isLastInGroup && !isMe && "rounded-bl-sm"
+                  <div className="flex items-end gap-2 max-w-[75%]">
+                    {!isMe && (
+                      <div className="w-8 flex-shrink-0">
+                        {isLastInGroup ? (
+                          <img
+                            src={AVATARS[msg.author]}
+                            alt={msg.author}
+                            className="w-8 h-8 rounded-full bg-gray-200 object-cover"
+                          />
+                        ) : <div className="w-8" />}
+                      </div>
                     )}
-                  >
-                    {msg.body}
+
+                    <div
+                      className={cn(
+                        "px-4 py-2 text-[17px] leading-snug break-words shadow-sm",
+                        isMe
+                          ? "bg-[#007AFF] text-white rounded-2xl rounded-br-md"
+                          : "bg-[#E9E9EB] dark:bg-[#262628] text-black dark:text-white rounded-2xl rounded-bl-md",
+                        !isLastInGroup && isMe && "rounded-br-2xl",
+                        !isLastInGroup && !isMe && "rounded-bl-2xl",
+                        isLastInGroup && isMe && "rounded-br-sm",
+                        isLastInGroup && !isMe && "rounded-bl-sm"
+                      )}
+                    >
+                      {msg.body}
+                    </div>
                   </div>
+
+                  {isMe && isLastInGroup && idx === messages.length - 1 && (
+                    <span className="text-[10px] text-[#8E8E93] font-medium mt-1 mr-1 transition-opacity duration-300">
+                      {readReceipt || "Delivered"}
+                    </span>
+                  )}
+                </motion.div>
+              );
+            })}
+          </AnimatePresence>
+
+          {/* Typing Indicators */}
+          <AnimatePresence>
+            {typing?.map((t) => (
+              <motion.div
+                key={t.author}
+                initial={{ opacity: 0, y: 5 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                className="flex items-start gap-2 max-w-[75%] mt-2"
+              >
+                <div className="w-8 flex-shrink-0">
+                  <img
+                    src={AVATARS[t.author]}
+                    alt={t.author}
+                    className="w-8 h-8 rounded-full bg-gray-200 object-cover"
+                  />
                 </div>
-
-                {isMe && isLastInGroup && idx === messages.length - 1 && (
-                  <span className="text-[10px] text-[#8E8E93] font-medium mt-1 mr-1">Delivered</span>
-                )}
+                <div className="bg-[#E9E9EB] dark:bg-[#262628] px-4 py-2.5 rounded-2xl flex items-center gap-1.5 shadow-sm">
+                  <div className="typing-dot" />
+                  <div className="typing-dot delay-100" />
+                  <div className="typing-dot delay-200" />
+                </div>
               </motion.div>
-            );
-          })}
-        </AnimatePresence>
-
-        {/* Typing Indicators */}
-        <AnimatePresence>
-          {typing?.map((t) => (
-            <motion.div
-              key={t.author}
-              initial={{ opacity: 0, y: 5 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
-              className="flex items-start gap-2 max-w-[85%] mt-2"
-            >
-              <div className="w-8 flex-shrink-0">
-                <img
-                  src={AVATARS[t.author]}
-                  alt={t.author}
-                  className="w-8 h-8 rounded-full bg-gray-200 object-cover"
-                />
-              </div>
-              <div className="bg-[#E9E9EB] dark:bg-[#262628] px-4 py-2.5 rounded-2xl flex items-center gap-1.5 shadow-sm">
-                <div className="typing-dot" />
-                <div className="typing-dot delay-100" />
-                <div className="typing-dot delay-200" />
-              </div>
-            </motion.div>
-          ))}
-        </AnimatePresence>
+            ))}
+          </AnimatePresence>
+        </div>
       </main>
 
       {/* Input Area */}
       <div className="ios-input-container">
-        <form onSubmit={handleSend} className="flex gap-3 items-center max-w-4xl mx-auto py-2">
+        <form onSubmit={handleSend} className="flex gap-3 items-center max-w-3xl mx-auto py-2">
           <button type="button" className="text-[#8E8E93] transition-colors">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
               <path fillRule="evenodd" d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm1 5.5a1 1 0 10-2 0v3.5H7.5a1 1 0 10 0 2h3.5v3.5a1 1 0 10 2 0v-3.5h3.5a1 1 0 10 0-2h-3.5V7.5z" clipRule="evenodd" />
