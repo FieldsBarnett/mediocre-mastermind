@@ -271,7 +271,7 @@ export default function App() {
             <input
               autoFocus
               type="text"
-              className="w-full rounded-full border border-[#C6C6C6] dark:border-[#3A3A3C] bg-white dark:bg-[#1C1C1E] pl-4 pr-10 py-1.5 text-[17px] text-black dark:text-white placeholder-[#8E8E93] focus:outline-none focus:border-[#8E8E93]"
+              className="w-full rounded-full border border-[#C6C6C6] dark:border-[#3A3A3C] bg-white dark:bg-[#1C1C1E] pl-4 pr-12 py-1.5 text-[17px] text-black dark:text-white placeholder-[#8E8E93] focus:outline-none focus:border-[#8E8E93]"
               placeholder="iMessage"
               value={input}
               onChange={(e) => setInput(e.target.value)}
@@ -279,16 +279,16 @@ export default function App() {
             {input.trim() && (
               <button
                 type="submit"
-                className="absolute right-1 top-1/2 -translate-y-1/2 p-0.5 rounded-full bg-[#007AFF] text-white"
+                className="absolute right-1.5 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-full bg-[#007AFF] text-white transition-all active:scale-95 z-10"
               >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M12 19V5M5 12l7-7 7 7" />
                 </svg>
               </button>
             )}
           </div>
           {!input.trim() && (
-            <button type="button" className="text-[#8E8E93]">
+            <button type="button" className="text-[#8E8E93] transition-all hover:scale-110 active:scale-95">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="12" cy="12" r="10" />
                 <line x1="12" y1="8" x2="16" y2="12" />
